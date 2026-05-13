@@ -1619,7 +1619,10 @@ class PnlDashboard:
                     _f.write(f"{_dt.datetime.now().strftime('%H:%M:%S')} {m}\n")
             except Exception:
                 pass
-        _w(f"_seleccionar_mejor_filtro llamado  solo_base={self._solo_base_mode}  fuente={self._fuente}")
+        _w(f"_seleccionar_mejor_filtro llamado  solo_base={self._solo_base_mode}  fuente={self._fuente}  pinned={self.panel_filtros._pinned_filter}")
+        if getattr(self.panel_filtros, '_pinned_filter', False):
+            _w("SALIDA: filtro anclado (pinned) — no se cambia")
+            return
         if self._solo_base_mode:
             if silencio_si_igual:
                 _w("SALIDA: solo_base_mode activo (auto-reeval)")
@@ -2183,6 +2186,8 @@ class PnlDashboard:
         """VUELTA_BASE: si Base pierde N veces seguidas, permite cambiar;
         si Base gana, se queda. Si un filtro no-Base pierde N veces, vuelve a Base."""
         from pnl_config import FILTER_PARAMS, FILTROS_CURVA
+        if getattr(self.panel_filtros, '_pinned_filter', False):
+            return
         max_racha = FILTER_PARAMS.get('vuelta_base', 3)
         if max_racha <= 0:
             return

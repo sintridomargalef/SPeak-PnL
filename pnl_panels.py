@@ -57,6 +57,7 @@ class PanelFiltros(tk.Frame):
 
         self._base_inv_active = False
         self._btn_base_inv    = None
+        self._pinned_filter = False
 
         self._construir()
 
@@ -67,6 +68,14 @@ class PanelFiltros(tk.Frame):
                 self._btn_base_inv.config(bg='#3A1A00', fg='#FF8800')
             else:
                 self._btn_base_inv.config(bg='#1A1A2A', fg=C['muted'])
+
+    def toggle_pin(self):
+        self._pinned_filter = not self._pinned_filter
+        if self._btn_pin:
+            if self._pinned_filter:
+                self._btn_pin.config(text='🔒', bg='#3A1A10', fg='#FFD700')
+            else:
+                self._btn_pin.config(text='🔓', bg=C['panel'], fg=C['warn'])
 
     # ── Propiedades publicas ─────────────────────────────────────
 
@@ -296,8 +305,14 @@ class PanelFiltros(tk.Frame):
     # ── Construccion interna ─────────────────────────────────────
 
     def _construir(self):
-        tk.Label(self, text="CURVAS EN GRAFICA", font=FONT_TITLE, bg=C['panel'],
-                 fg=C['accent']).pack(pady=8)
+        _hdr = tk.Frame(self, bg=C['panel'])
+        _hdr.pack(fill='x', pady=8, padx=10)
+        tk.Label(_hdr, text="CURVAS EN GRAFICA", font=FONT_TITLE, bg=C['panel'],
+                 fg=C['accent']).pack(side='left')
+        self._btn_pin = tk.Button(_hdr, text='🔓', font=('Consolas', 11),
+                                  bg=C['panel'], fg=C['warn'], relief='flat',
+                                  cursor='hand2', padx=4, command=self.toggle_pin)
+        self._btn_pin.pack(side='right')
         tk.Frame(self, bg=C['border'], height=1).pack(fill='x', padx=10, pady=(0, 4))
 
         for i, entry_c in enumerate(FILTROS_CURVA):

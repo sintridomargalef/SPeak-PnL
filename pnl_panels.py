@@ -258,7 +258,7 @@ class PanelFiltros(tk.Frame):
 
         nombre = FILTROS_CURVA[mejor_idx][0]
         cambio = (mejor_idx != self._selected_filter)
-        _log(f"{LOG} âœ… MEJOR: [{mejor_idx}] {nombre}  pnl={mejor_pnl:+.2f}  cambio={cambio}")
+        _log(f"{LOG} [*] MEJOR: [{mejor_idx}] {nombre}  pnl={mejor_pnl:+.2f}  cambio={cambio}")
 
         if silencio_si_igual and not cambio:
             _log(f"{LOG} â­ SALIDA: silencio_si_igual=True y filtro no cambia")
@@ -700,7 +700,7 @@ class PanelLive(tk.Frame):
 
                 pnl_r = 0.9 if acierto_ajustado else -1.0
                 col_r = C['accent2'] if acierto_ajustado else C['accent3']
-                marca = 'âœ“' if acierto_ajustado else 'âœ—'
+                marca = 'V' if acierto_ajustado else 'X'
                 row_lbls[0].config(text=marca, fg=col_r)
                 row_lbls[1].config(text=op['rango'], fg=C['text'])
                 row_lbls[2].config(text=op['mayor'].capitalize(), fg='#2B7FFF' if op['mayor']=='azul' else C['red'])
@@ -814,18 +814,18 @@ class PanelLive(tk.Frame):
         except Exception:
             siguiente = None
         if siguiente is None:
-            self._lbl_validacion.config(text="âœ“ nivel mÃ¡ximo alcanzado", fg='#00FF88')
+            self._lbl_validacion.config(text="[V] nivel maximo alcanzado", fg='#00FF88')
             return
         if cumple:
             self._lbl_validacion.config(
-                text=f"âœ“ {siguiente}â‚¬ OK ({ventaja:+.1f}â‚¬/{ops}op)",
+                text=f"[V] {siguiente} EUR OK ({ventaja:+.1f} EUR/{ops}op)",
                 fg='#00FF88')
         else:
             falta_ops = max(0, self._validacion_min_ops - ops)
             if falta_ops > 0:
-                txt = f"âš  {siguiente}â‚¬: faltan {falta_ops}op"
+                txt = f"âš  {siguiente}EUR: faltan {falta_ops}op"
             else:
-                txt = f"âš  {siguiente}â‚¬: {ventaja:+.1f}â‚¬ < {self._validacion_ventaja_min:.0f}â‚¬"
+                txt = f"âš  {siguiente}EUR: {ventaja:+.1f}EUR < {self._validacion_ventaja_min:.0f}EUR"
             self._lbl_validacion.config(text=txt, fg='#FF4444')
 
     def _on_cambio_apuesta_base(self, *_):
@@ -1141,7 +1141,7 @@ class PanelLive(tk.Frame):
             # Apuesta real: comparar color con ganador
             apuesta_correcta = (color.lower() == winner.lower())
             d['acierto']       = apuesta_correcta
-            d['acierto_marca'] = 'âœ“' if apuesta_correcta else 'âœ—'
+            d['acierto_marca'] = 'V' if apuesta_correcta else 'X'
             _ap = float(d.get('apuesta') or 1)
             _m  = float(d.get('mult') or 1)
             d['pnl']           = round((0.9 * _ap * _m) if apuesta_correcta else (-1.0 * _ap * _m), 2)
@@ -1161,7 +1161,7 @@ class PanelLive(tk.Frame):
             if color:
                 teorico_correcto   = (color.lower() == winner.lower())
                 d['acierto']       = teorico_correcto
-                d['acierto_marca'] = 'âœ“' if teorico_correcto else 'âœ—'
+                d['acierto_marca'] = 'V' if teorico_correcto else 'X'
             else:
                 d['acierto']       = None
                 d['acierto_marca'] = 'Â·'
@@ -1178,7 +1178,7 @@ class PanelLive(tk.Frame):
             # Si hay color_apostado, el filtro decidiÃ³ apostar â†’ siempre computar PNL.
             teorico_correcto   = (color.lower() == winner.lower())
             d['acierto']       = teorico_correcto
-            d['acierto_marca'] = 'âœ“' if teorico_correcto else 'âœ—'
+            d['acierto_marca'] = 'V' if teorico_correcto else 'X'
             _ap_sk = float(d.get('apuesta') or 1)
             _m_sk  = float(d.get('mult') or 1)
             d['pnl'] = round((0.9 * _ap_sk * _m_sk) if teorico_correcto else (-1.0 * _ap_sk * _m_sk), 2)
@@ -1200,7 +1200,7 @@ class PanelLive(tk.Frame):
                 d['color_apostado'] = color
                 teorico_correcto    = (color.lower() == winner.lower())
                 d['acierto']        = teorico_correcto
-                d['acierto_marca']  = 'âœ“' if teorico_correcto else 'âœ—'
+                d['acierto_marca']  = 'V' if teorico_correcto else 'X'
                 # Si modo es SKIP â†’ no contar PNL en balance_filtro.
                 if modo_zn in ('DIRECTO', 'INVERSO', 'BASE'):
                     _ap_zn = float(d.get('apuesta') or 1)
@@ -1334,7 +1334,7 @@ class PanelLive(tk.Frame):
             _prev_txt = _EMOJI.get(_cp, 'âšª') if _cp else 'âšª'
             _win_txt  = _EMOJI.get(_w, 'âšª') if _w else '?'
             _issue = str(d.get('issue') or '---')[-3:]
-            _copa = "  ðŸ†" if _marca == 'âœ“' else ""
+            _copa = "  [T]" if _marca == 'V' else ""
             _msg = (f"{_hora_resultado} {_issue}  {_prev_txt} â†’ {_win_txt}  {_marca}{_copa}\n"
                     f"Saldo: {self._saldo_global_historico:+.2f}")
             threading.Thread(target=self._tg_send_filtrado, args=(_msg,), daemon=True).start()
@@ -1744,9 +1744,9 @@ class PanelLive(tk.Frame):
         if _modo == 'SKIP':
             marca, tag_r, pnl_r = 'â—Œ SKIP',    'dim',       0.0
         elif acierto:
-            marca, tag_r, pnl_r = 'âœ“ ACIERTO', 'resultado', +0.9 * _mult
+            marca, tag_r, pnl_r = 'V ACIERTO', 'resultado', +0.9 * _mult
         else:
-            marca, tag_r, pnl_r = 'âœ— FALLO',   'perdida',   -1.0 * _mult
+            marca, tag_r, pnl_r = 'X FALLO',   'perdida',   -1.0 * _mult
 
         # ðŸ“‹ LOGGING DETALLADO para anÃ¡lisis
         _log_line = (

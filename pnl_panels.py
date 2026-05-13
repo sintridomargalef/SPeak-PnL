@@ -73,9 +73,9 @@ class PanelFiltros(tk.Frame):
         self._pinned_filter = not self._pinned_filter
         if self._btn_pin:
             if self._pinned_filter:
-                self._btn_pin.config(text='ðŸ”’', bg='#3A1A10', fg='#FFD700')
+                self._btn_pin.config(text='PIN', bg='#3A1A10', fg='#FFD700')
             else:
-                self._btn_pin.config(text='ðŸ”“', bg=C['panel'], fg=C['warn'])
+                self._btn_pin.config(text='PIN', bg=C['panel'], fg=C['warn'])
 
     # â”€â”€ Propiedades publicas â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
@@ -309,7 +309,7 @@ class PanelFiltros(tk.Frame):
         _hdr.pack(fill='x', pady=8, padx=10)
         tk.Label(_hdr, text="CURVAS EN GRAFICA", font=FONT_TITLE, bg=C['panel'],
                  fg=C['accent']).pack(side='left')
-        self._btn_pin = tk.Button(_hdr, text='ðŸ”“', font=('Consolas', 11),
+        self._btn_pin = tk.Button(_hdr, text='PIN', font=('Consolas', 11),
                                   bg=C['panel'], fg=C['warn'], relief='flat',
                                   cursor='hand2', padx=4, command=self.toggle_pin)
         self._btn_pin.pack(side='right')

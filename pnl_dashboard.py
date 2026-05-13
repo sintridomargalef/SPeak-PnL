@@ -1806,8 +1806,13 @@ class PnlDashboard:
             nombre, _, filtro_fn, contrarian, raw = FILTROS_CURVA[i]
         except Exception:
             return 0.0
-        if filtro_fn is None or isinstance(filtro_fn, str):
+if filtro_fn is None or isinstance(filtro_fn, str):
             return 0.0
+        # Si este filtro era el activo en la ronda, usar PnL real
+        if i == d.get('filtro_idx'):
+            pnl = d.get('pnl')
+            if pnl is not None:
+                return float(pnl)
         # Construir 'op' compatible con las lambdas de FILTROS_CURVA
         modo = d.get('modo', 'SKIP')
         wr_d = float(d.get('wr') or 50)

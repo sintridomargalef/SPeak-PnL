@@ -34,6 +34,11 @@ def _delta_teorico(d: dict, i: int) -> float:
         return 0.0
     if fn is None or isinstance(fn, str):
         return 0.0
+    # Si este filtro era el activo en la ronda, usar PnL real
+    if i == d.get('filtro_idx'):
+        pnl = d.get('pnl')
+        if pnl is not None:
+            return float(pnl)
     modo = d.get('modo', 'SKIP')
     wr_d = float(d.get('wr') or 50)
     if modo == 'BASE':

@@ -1451,9 +1451,15 @@ class PanelLive(tk.Frame):
                         _gano_ep = (_color_ap == _winner)
                         _eu_pnl = round(0.9 * factor if _gano_ep else -1.0 * factor, 2)
                     resultado[i] = _eu_pnl
-                else:
+else:
                     resultado[i] = 0.0
                 continue
+            # Si este filtro era el activo en la ronda, usar PnL real
+            if i == d.get('filtro_idx'):
+                pnl = d.get('pnl')
+                if pnl is not None:
+                    resultado[i] = float(pnl)
+                    continue
             # Sin winner → no se puede calcular
             if not winner or not mayor:
                 resultado[i] = 0.0

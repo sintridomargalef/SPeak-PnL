@@ -2745,24 +2745,14 @@ class HistoricoApuestasPanel(tk.Frame):
 
     def refrescar(self, decisiones, balance_inicial=0.0):
         self._cv.delete('row')
-        # Cache de nombres de filtro → índice (para datos antiguos sin filtro_idx)
-        _name_to_idx = {nombre: i for i, (nombre, *_) in enumerate(FILTROS_CURVA)}
         rows = []
         for d in reversed(decisiones):
             if d.get('decision') != 'APOSTADA':
                 continue
-            idx = d.get('filtro_idx')
-            if idx is None:
-                idx = _name_to_idx.get(d.get('filtro', ''))
-            if idx is None:
+            pnl = d.get('pnl')
+            if pnl is None or float(pnl) == 0:
                 continue
-            pf = d.get('pnl_filtros') or {}
-            delta = pf.get(str(idx))
-            if delta is None:
-                delta = pf.get(idx)
-            if delta is None or float(delta) == 0:
-                continue
-            rows.append((d, float(delta)))
+            rows.append((d, float(pnl)))
         saldo = balance_inicial
         n = len(rows)
         total_h = self.HDR_H + n * self.ROW_H + 4

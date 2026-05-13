@@ -235,14 +235,14 @@ class PanelFiltros(tk.Frame):
             nombre_f = entry_f[0]
 
             if filtro is None or isinstance(filtro, str):
-                _log(f"{LOG}   [{i:2}] {nombre_f[:20]:<20} â†’ SKIP (filtro especial)")
+                _log(f"{LOG}   [{i:2}] {nombre_f[:20]:<20} → SKIP (filtro especial)")
                 continue
 
             curva, _, n_bets = curva_pnl(ops, filtro, contrarian=contrario, raw=raw_f)
             pnl = curva[-1] if curva else float('-inf')
 
             if n_bets < MIN_OPS_VENTANA:
-                _log(f"{LOG}   [{i:2}] {nombre_f[:20]:<20} â†’ SKIP (n_bets={n_bets} < {MIN_OPS_VENTANA})")
+                _log(f"{LOG}   [{i:2}] {nombre_f[:20]:<20} → SKIP (n_bets={n_bets} < {MIN_OPS_VENTANA})")
                 continue
 
             marca = " â—€ MEJOR" if pnl > mejor_pnl else ""
@@ -264,7 +264,7 @@ class PanelFiltros(tk.Frame):
             _log(f"{LOG} â­ SALIDA: silencio_si_igual=True y filtro no cambia")
             return
 
-        _log(f"{LOG} â†’ seleccion_rapida([0, {mejor_idx}])")
+        _log(f"{LOG} → seleccion_rapida([0, {mejor_idx}])")
         self.seleccion_rapida([0, mejor_idx], seleccionado=mejor_idx)
         hablar(f"{mejor_idx} {nombre}")
         _log(f"{LOG} â”€â”€ FIN â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€")
@@ -463,11 +463,11 @@ class PanelLive(tk.Frame):
         self._monitor = monitor
         self._get_filtro_state = get_filtro_state
         self._on_resultado = on_resultado
-        self._on_senal = on_senal   # callback(nombre_filtro, color) â†’ actualiza tÃ­tulo ventana
+        self._on_senal = on_senal   # callback(nombre_filtro, color) → actualiza tÃ­tulo ventana
         self._ep_gate_activo = ep_gate_activo if ep_gate_activo is not None else (lambda: True)
         self._solo_base_activo = solo_base_activo if solo_base_activo is not None else (lambda: False)
-        self._get_ep_wr = get_ep_wr   # callback(rango, modo) â†’ WR% float o None
-        self._on_auto_reeval = on_auto_reeval   # callback() â†’ re-evalÃºa mejor filtro cada 5 rondas
+        self._get_ep_wr = get_ep_wr   # callback(rango, modo) → WR% float o None
+        self._on_auto_reeval = on_auto_reeval   # callback() → re-evalÃºa mejor filtro cada 5 rondas
         self._rondas_desde_reeval = 0           # contador para re-evaluaciÃ³n automÃ¡tica
 
         # Estado de datos
@@ -552,6 +552,8 @@ class PanelLive(tk.Frame):
         self._lbl_validacion           = None
         self._panel_decision_window = None # set externamente para refresco
         self._saldo_global_historico = 0.0   # actualizado por dashboard tras refrescar historico
+        self._balance_historico_inicio = 0.0 # set por dashboard al arrancar y en BALANCES
+        self._balance_historico_inicio = 0.0 # set por dashboard al arrancar y en BALANCES
 
         # Referencias UI (se asignan en _construir)
         self._lbl_live_status = None
@@ -756,7 +758,7 @@ class PanelLive(tk.Frame):
             r = it.get('response') or {}
             if not r.get('ok'):
                 detalle = r.get('description') or r.get('error') or str(r)[:120]
-                self._tg_log(f"[TG ERROR] chat={it.get('chat_id')} â†’ {detalle}")
+                self._tg_log(f"[TG ERROR] chat={it.get('chat_id')} → {detalle}")
 
     # â”€â”€ ValidaciÃ³n de escalado de apuesta base â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     _ESCALADO_VALORES = ('0.1', '0.2', '0.3', '0.5', '1', '2')
@@ -979,7 +981,7 @@ class PanelLive(tk.Frame):
         return max(1, min(8, pts))
 
     def _set_conf(self, v):
-        """Selecciona el nivel de confianza pre-apuesta (1-8). v=0 â†’ en blanco."""
+        """Selecciona el nivel de confianza pre-apuesta (1-8). v=0 → en blanco."""
         self._conf_apuesta = v
         for i, b in enumerate(self._conf_btns):
             sel = (v > 0 and i + 1 == v)
@@ -1009,7 +1011,7 @@ class PanelLive(tk.Frame):
         _n_ep = min(len(_hist), 20)
         wr_ep_rolling = round(sum(1 for o in _hist[-_n_ep:] if o['acierto']) / _n_ep * 100, 1) if _n_ep else 0.0
 
-        # Multiplicador EP (1, 2, 3, â€¦) segÃºn rango+modo. SKIP/BASE â†’ 1.
+        # Multiplicador EP (1, 2, 3, â€¦) segÃºn rango+modo. SKIP/BASE → 1.
         _rango_reg = calcular_rango(getattr(self._monitor, '_dif_t33', 0.0))
         _ap_base   = float(self._apuesta_base_var.get())
         if modo_t36 in ('DIRECTO', 'INVERSO'):
@@ -1020,7 +1022,7 @@ class PanelLive(tk.Frame):
         # Propagar la seÃ±al del filtro activo (calculada en _calcular_senal) cuando
         # no hubo apuesta real, para que el color y el PNL sean coherentes con
         # `_calcular_pnl_filtros`. SÃ³lo si modo es direccional (DIRECTO/INVERSO/BASE):
-        # con modo SKIP no apostamos teÃ³ricamente â†’ no contar PNL ni mover balance.
+        # con modo SKIP no apostamos teÃ³ricamente → no contar PNL ni mover balance.
         if not color_apostado and modo_t36 in ('DIRECTO', 'INVERSO', 'BASE'):
             _signal = getattr(self, '_color_apuesta_actual', None)
             if isinstance(_signal, str) and _signal.upper() in ('AZUL', 'ROJO'):
@@ -1072,7 +1074,7 @@ class PanelLive(tk.Frame):
         guardar_decisiones(self._decisiones)
         self._refrescar_decision_window()
 
-        # Telegram: enviar predicciÃ³n. SKIP â†’ bolita blanca; con seÃ±al â†’ color.
+        # Telegram: enviar predicciÃ³n. SKIP → bolita blanca; con seÃ±al → color.
         _color_filtro = color_apostado or getattr(self, '_color_apuesta_actual', None)
         registro['_tg_envio'] = bool(self._tg_activo)
         registro['_tg_color'] = (color_apostado or _color_filtro or '')
@@ -1081,11 +1083,11 @@ class PanelLive(tk.Frame):
         # cuando la predicciÃ³n fue bolita blanca (no apuesta).
         registro['_tg_skip_resultado'] = bool(_no_apuesta)
         if registro['_tg_envio']:
-            _EMOJI = {'azul': 'ðŸ”µ', 'rojo': 'ðŸ”´'}
+            _EMOJI = {'azul': '🔵', 'rojo': '🔴'}
             _cp  = (color_apostado or _color_filtro or '').lower()
             _iss = str(self._issue_actual or '---')[-3:]
             _hr  = registro['hora']
-            _prev_txt = 'âšª' if _no_apuesta else (_EMOJI.get(_cp, 'âšª') if _cp else 'âšª')
+            _prev_txt = '⚪' if _no_apuesta else (_EMOJI.get(_cp, '⚪') if _cp else '⚪')
             try:
                 _sel, _ = self._get_filtro_state()
                 _nombre_f = FILTROS_CURVA[_sel][0]
@@ -1122,7 +1124,7 @@ class PanelLive(tk.Frame):
         # (â‰¥53.2 DIRECTO o â‰¤46.8 INVERSO) para que la columna Color refleje
         # lo que el filtro habrÃ­a apostado. En zona neutra queda vacÃ­a.
         # Si el filtro activo es EP UMBRAL y `color` ya es None aquÃ­, significa
-        # que el filtro NO seÃ±alÃ³ (rango sin stats suficientes) â†’ no aplicar
+        # que el filtro NO seÃ±alÃ³ (rango sin stats suficientes) → no aplicar
         # el fallback wr_ep para que PNL=0 y coincida con balance_filtro.
         _filtro_d = (d.get('filtro') or '').upper()
         if not color and decision != 'OBS' and _filtro_d != 'EP UMBRAL':
@@ -1130,12 +1132,12 @@ class PanelLive(tk.Frame):
             wr_ep   = d.get('wr_ep') or 0.0
             EP_UMB  = 53.2
             if wr_ep >= EP_UMB and mayor_d:
-                color = mayor_d                                        # DIRECTO â†’ mayorÃ­a
+                color = mayor_d                                        # DIRECTO → mayorÃ­a
                 d['color_apostado'] = color
             elif wr_ep <= (100 - EP_UMB) and mayor_d:
-                color = 'ROJO' if mayor_d == 'AZUL' else 'AZUL'       # INVERSO â†’ minorÃ­a
+                color = 'ROJO' if mayor_d == 'AZUL' else 'AZUL'       # INVERSO → minorÃ­a
                 d['color_apostado'] = color
-            # else: zona neutra real â†’ color sigue None â†’ marca 'Â·'
+            # else: zona neutra real → color sigue None → marca 'Â·'
 
         if decision == 'APOSTADA' and color:
             # Apuesta real: comparar color con ganador
@@ -1146,7 +1148,7 @@ class PanelLive(tk.Frame):
             _m  = float(d.get('mult') or 1)
             d['pnl']           = round((0.9 * _ap * _m) if apuesta_correcta else (-1.0 * _ap * _m), 2)
         elif decision == 'OBS':
-            # ObservaciÃ³n: derivar color teÃ³rico del modo; SKIP â†’ usar mayorÃ­a como ref.
+            # ObservaciÃ³n: derivar color teÃ³rico del modo; SKIP → usar mayorÃ­a como ref.
             modo_d  = d.get('modo', '')
             mayor_d = (d.get('mayor') or '').upper()
             if modo_d == 'DIRECTO' and mayor_d:
@@ -1165,7 +1167,7 @@ class PanelLive(tk.Frame):
             else:
                 d['acierto']       = None
                 d['acierto_marca'] = 'Â·'
-            # PNL teÃ³rico para DIRECTO/INVERSO; SKIP â†’ 0
+            # PNL teÃ³rico para DIRECTO/INVERSO; SKIP → 0
             if color and modo_d in ('DIRECTO', 'INVERSO'):
                 _ap_obs = float(d.get('apuesta') or 1)
                 _m_obs  = float(d.get('mult') or 1)
@@ -1175,7 +1177,7 @@ class PanelLive(tk.Frame):
                 d['pnl'] = 0.0
         elif color:
             # SKIP con color teÃ³rico (filtro seÃ±alÃ³ o ep_dir calculado).
-            # Si hay color_apostado, el filtro decidiÃ³ apostar â†’ siempre computar PNL.
+            # Si hay color_apostado, el filtro decidiÃ³ apostar → siempre computar PNL.
             teorico_correcto   = (color.lower() == winner.lower())
             d['acierto']       = teorico_correcto
             d['acierto_marca'] = 'V' if teorico_correcto else 'X'
@@ -1184,7 +1186,7 @@ class PanelLive(tk.Frame):
             d['pnl'] = round((0.9 * _ap_sk * _m_sk) if teorico_correcto else (-1.0 * _ap_sk * _m_sk), 2)
         else:
             # SKIP zona neutra: derivar color segÃºn modo (DIRECTO=mayor, INVERSO=minorÃ­a).
-            # Para EP UMBRAL, si llegamos aquÃ­ es porque el filtro no seÃ±alÃ³ â†’
+            # Para EP UMBRAL, si llegamos aquÃ­ es porque el filtro no seÃ±alÃ³ →
             # PNL = 0 y sin marca para coincidir con balance_filtro.
             mayor_d = (d.get('mayor') or '').upper()
             modo_zn = d.get('modo', '')
@@ -1201,7 +1203,7 @@ class PanelLive(tk.Frame):
                 teorico_correcto    = (color.lower() == winner.lower())
                 d['acierto']        = teorico_correcto
                 d['acierto_marca']  = 'V' if teorico_correcto else 'X'
-                # Si modo es SKIP â†’ no contar PNL en balance_filtro.
+                # Si modo es SKIP → no contar PNL en balance_filtro.
                 if modo_zn in ('DIRECTO', 'INVERSO', 'BASE'):
                     _ap_zn = float(d.get('apuesta') or 1)
                     _m_zn  = float(d.get('mult') or 1)
@@ -1215,7 +1217,7 @@ class PanelLive(tk.Frame):
 
         d['winner'] = winner
 
-        # Gate final: SKIP/OBS sin apuesta real â†’ forzar pnl=0 y acierto=None
+        # Gate final: SKIP/OBS sin apuesta real → forzar pnl=0 y acierto=None
         # (ningÃºn cÃ¡lculo teÃ³rico debe propagarse a la columna PNL visible).
         if d.get('decision') != 'APOSTADA':
             # Conservar el dato teÃ³rico en campos paralelos por si se quiere analizar
@@ -1327,22 +1329,31 @@ class PanelLive(tk.Frame):
 
         # NotificaciÃ³n Telegram: enviar resultado sÃ³lo si la predicciÃ³n NO fue bolita blanca.
         if self._tg_activo and d.get('_tg_envio') and not d.get('_tg_skip_resultado'):
-            _EMOJI = {'azul': 'ðŸ”µ', 'rojo': 'ðŸ”´'}
+            _EMOJI = {'azul': '🔵', 'rojo': '🔴'}
             _w  = (d.get('winner') or '').lower()
             _cp = (d.get('color_apostado') or d.get('_tg_color') or '').lower()
             _marca = d.get('acierto_marca', 'Â·')
-            _prev_txt = _EMOJI.get(_cp, 'âšª') if _cp else 'âšª'
-            _win_txt  = _EMOJI.get(_w, 'âšª') if _w else '?'
+            _prev_txt = _EMOJI.get(_cp, '⚪') if _cp else '⚪'
+            _win_txt  = _EMOJI.get(_w, '⚪') if _w else '?'
             _issue = str(d.get('issue') or '---')[-3:]
             _copa = "  [T]" if _marca == 'V' else ""
-            _msg = (f"{_hora_resultado} {_issue}  {_prev_txt} â†’ {_win_txt}  {_marca}{_copa}\n"
-                    f"Saldo: {self._saldo_global_historico:+.2f}")
+            # Calcular saldo acumulado actual desde las decisiones de sesion
+            _tg_saldo = self._balance_historico_inicio
+            for _td in self._decisiones[self._session_decision_start:]:
+                if _td.get('decision') != 'APOSTADA':
+                    continue
+                _tp = _td.get('pnl')
+                if _tp is None or float(_tp) == 0:
+                    continue
+                _tg_saldo += float(_tp)
+            _msg = (f"{_hora_resultado} {_issue}  {_prev_txt} → {_win_txt}  {_marca}{_copa}\n"
+                    f"Saldo: {_tg_saldo:+.2f}")
             threading.Thread(target=self._tg_send_filtrado, args=(_msg,), daemon=True).start()
 
         # â”€â”€ ANIMACIONES DE VICTORIA â€” gate Ãºnico compartido â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         # Ambas victorias requieren la MISMA condiciÃ³n de "ganaste dinero
         # de verdad": decision=APOSTADA + acierto=True + pnl>0 + color
-        # apostado coincide con el winner. Si cualquiera falla â†’ silencio.
+        # apostado coincide con el winner. Si cualquiera falla → silencio.
         _color_ap = (d.get('color_apostado') or '').strip().lower()
         _winner_d = (d.get('winner') or '').strip().lower()
         _mayor_d  = (d.get('mayor')  or '').strip().lower()
@@ -1424,13 +1435,13 @@ class PanelLive(tk.Frame):
         # FORZAR cÃ¡lculo teÃ³rico de TODOS los filtros en CADA ronda,
         # ignorando sus condiciones de lambda y `skip`.
         # Cada filtro apuesta siempre a su direcciÃ³n preferida:
-        #   - raw â†’ mayor (Base bet siempre a mayorÃ­a)
-        #   - nombre con "INVERSO" â†’ minor
-        #   - resto â†’ mayor (defecto DIRECTO)
+        #   - raw → mayor (Base bet siempre a mayorÃ­a)
+        #   - nombre con "INVERSO" → minor
+        #   - resto → mayor (defecto DIRECTO)
         # Luego se aplica contrarian si el filtro lo tiene.
         # Filtros especiales (None / string) se calculan aparte.
         resultado = {}
-        # REGLA ABSOLUTA: si decision != APOSTADA â†’ delta=0 para TODOS los
+        # REGLA ABSOLUTA: si decision != APOSTADA → delta=0 para TODOS los
         # filtros. Sin teÃ³ricos, sin "hubiera apostado". SÃ³lo cuenta el dinero
         # realmente movido en la ronda.
         _no_apuesta = (decision != 'APOSTADA')
@@ -1460,7 +1471,7 @@ class PanelLive(tk.Frame):
                 if pnl is not None:
                     resultado[i] = float(pnl)
                     continue
-            # Sin winner â†’ no se puede calcular
+            # Sin winner → no se puede calcular
             if not winner or not mayor:
                 resultado[i] = 0.0
                 continue
@@ -1477,9 +1488,9 @@ class PanelLive(tk.Frame):
                     resultado[i] = 0.0
                     continue
             # DirecciÃ³n preferida del filtro â€” alineada con live (`_calcular_senal`):
-            #   raw            â†’ mayor (Base apuesta siempre a mayorÃ­a)
-            #   nombre INVERSO â†’ minor (filtros forzados a INVERSO)
-            #   resto          â†’ sigue op['modo'] (DIRECTO=mayor, INVERSO=minor)
+            #   raw            → mayor (Base apuesta siempre a mayorÃ­a)
+            #   nombre INVERSO → minor (filtros forzados a INVERSO)
+            #   resto          → sigue op['modo'] (DIRECTO=mayor, INVERSO=minor)
             # DespuÃ©s contrarian invierte la apuesta final.
             if raw:
                 gano = op['gano_mayoria']
@@ -1532,7 +1543,7 @@ class PanelLive(tk.Frame):
             if delta is None:
                 delta = pnl_f.get(i)
             if delta is None:
-                # EP ADAPTATIVO (None) â†’ registrar como 0 para mantener una lÃ­nea por filtro
+                # EP ADAPTATIVO (None) → registrar como 0 para mantener una lÃ­nea por filtro
                 delta = 0.0
             try:
                 delta = float(delta)
@@ -2016,7 +2027,7 @@ class PanelLive(tk.Frame):
             else:
                 modo = 'INVERSO'
         elif filtro == 'BAL_FILTRO':
-            # BAL_FILTRO es registro real, no seÃ±al â†’ SKIP
+            # BAL_FILTRO es registro real, no seÃ±al → SKIP
             self._lbl_senal.config(text="SEÃ‘AL", fg=C['muted'])
             self._lbl_apuesta.config(text="SKIP", fg=C['warn'])
             self._btn_apostar.config(state='disabled', bg='#1A1A2A', fg=C['muted'])
@@ -2035,7 +2046,7 @@ class PanelLive(tk.Frame):
                     _wr_10 = round(_n_gan / len(_ult_n) * 100, 1) if _ult_n else 0
                     self._tick_log_append(
                         f"[FILTRO 11] MayorÃ­a ganÃ³ {_n_gan}/{len(_ult_n)} ({_wr_10}%) â€” "
-                        f"requiere <40% â†’ SKIP\n", 'muted')
+                        f"requiere <40% → SKIP\n", 'muted')
                 return
 
         # Descartar si el filtro tiene PNL negativo en histÃ³rico
@@ -2107,7 +2118,7 @@ class PanelLive(tk.Frame):
                     self._apuesta_enviada = True
                     _ap = Path(__file__).parent / 'apuesta.py'
                     self._tick_log_append(
-                        f"[{_etiq}] mayorÃ­a={mayor} â†’ apuesta {_base_c}\n", 'warn')
+                        f"[{_etiq}] mayorÃ­a={mayor} → apuesta {_base_c}\n", 'warn')
                     try:
                         proc = subprocess.Popen(
                             ['py', str(_ap), _base_c, str(float(self._apuesta_base_var.get()))],
@@ -2165,7 +2176,7 @@ class PanelLive(tk.Frame):
                 _ap = Path(__file__).parent / 'apuesta.py'
                 _ab_inv = round(float(self._apuesta_base_var.get()) * self._ep_mult_actual(_rango_t35, 'INVERSO'), 2)
                 self._tick_log_append(
-                    f"[SOLO INVERSO] mayorÃ­a={mayor} â†’ apuesta {_inv_color}\n", 'warn')
+                    f"[SOLO INVERSO] mayorÃ­a={mayor} → apuesta {_inv_color}\n", 'warn')
                 try:
                     proc = subprocess.Popen(
                         ['py', str(_ap), _inv_color, str(_ab_inv)],
@@ -2214,7 +2225,7 @@ class PanelLive(tk.Frame):
                     _ab = round(float(self._apuesta_base_var.get()) *
                                 self._ep_mult_actual(_rango_t35, _modo_adapt), 2)
                     self._tick_log_append(
-                        f"[EP UMBRAL {self._ep_umbral_regimen}] â†’ apuesta {color_adapt}\n", 'warn')
+                        f"[EP UMBRAL {self._ep_umbral_regimen}] → apuesta {color_adapt}\n", 'warn')
                     try:
                         proc = subprocess.Popen(
                             ['py', str(_ap), color_adapt, str(_ab)],
@@ -2266,7 +2277,7 @@ class PanelLive(tk.Frame):
                         _modo_goff = 'DIRECTO' if color == mayor else 'INVERSO'
                         _ab_goff = round(float(self._apuesta_base_var.get()) * self._ep_mult_actual(_rango_t35, _modo_goff), 2)
                         self._tick_log_append(
-                            f"[GATE OFF] mayorÃ­a={mayor} â†’ apuesta {color}\n", 'warn')
+                            f"[GATE OFF] mayorÃ­a={mayor} → apuesta {color}\n", 'warn')
                         try:
                             proc = subprocess.Popen(
                                 ['py', str(_ap), color, str(_ab_goff)],
@@ -2317,7 +2328,7 @@ class PanelLive(tk.Frame):
                             _ap = Path(__file__).parent / 'apuesta.py'
                             _ab_ep = round(float(self._apuesta_base_var.get()) * self._ep_mult_actual(_rango_t35, ep_dir), 2)
                             self._tick_log_append(
-                                f"[EPâ†’{ep_dir}] mayorÃ­a={mayor} â†’ apuesta {color}\n", 'warn')
+                                f"[EP→{ep_dir}] mayorÃ­a={mayor} → apuesta {color}\n", 'warn')
                             try:
                                 proc = subprocess.Popen(
                                     ['py', str(_ap), color, str(_ab_ep)],

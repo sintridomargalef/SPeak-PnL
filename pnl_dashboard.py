@@ -150,6 +150,8 @@ class PnlDashboard:
             self.root.geometry(f"{w}x{cfg['h']}+{cfg['x']}+{cfg['y']}")
             self._solo_base_mode = bool(cfg.get('solo_base', False))
             self._balance_historico_inicio = float(cfg.get('balance_historico', 0.0))
+            if hasattr(self, 'panel_live'):
+                self.panel_live._balance_historico_inicio = self._balance_historico_inicio
         except Exception:
             self.root.geometry("3100x1000")
 
@@ -916,6 +918,7 @@ class PnlDashboard:
             pl._balance_real_inicio   = round(nuevo_real   - delta_real,   2)
             pl._balance_filtro_inicio = round(nuevo_filtro - delta_filtro, 2)
             self._balance_historico_inicio = round(nuevo_hist, 2)
+            pl._balance_historico_inicio = self._balance_historico_inicio
             pl.actualizar_ui()
             self._dibujar()
             try:

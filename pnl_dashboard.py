@@ -1806,7 +1806,7 @@ class PnlDashboard:
             nombre, _, filtro_fn, contrarian, raw = FILTROS_CURVA[i]
         except Exception:
             return 0.0
-if filtro_fn is None or isinstance(filtro_fn, str):
+        if filtro_fn is None or isinstance(filtro_fn, str):
             return 0.0
         # Si este filtro era el activo en la ronda, usar PnL real
         if i == d.get('filtro_idx'):

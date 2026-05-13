@@ -1,0 +1,35 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell(Start-Process py -ArgumentList \"C:\\\\Python\\\\SPeak\\\\pnl_dashboard.py\" -WindowStyle Hidden)",
+      "Bash(dir C:\\\\Python\\\\SPeak\\\\*.py /b)",
+      "Bash(mkdir -p \"C:/Python/RummyKub/data\")",
+      "Read(//c/Python/**)",
+      "Bash(rm -rf data/torneo_rummykub.json data/.last_path)",
+      "Bash(ls data/)",
+      "Bash(claude --version)",
+      "Bash(git --version)",
+      "Bash(echo:*)",
+      "Bash(wsl bash:*)",
+      "Bash(wsl:*)",
+      "Bash(C:Pythonpython.exe -c ' *)",
+      "Bash(python3 -c \"import json,sys; d=json.load\\(sys.stdin\\); print\\(json.dumps\\(d[0], indent=2\\)\\); print\\('---'\\); print\\('Total records:', len\\(d\\)\\); print\\('---'\\); print\\('Keys in record 0:', sorted\\(d[0].keys\\(\\)\\)\\); print\\('---'\\); print\\('Keys in record 7:', sorted\\(d[7].keys\\(\\)\\) if len\\(d\\) > 7 else 'N/A'\\)\")",
+      "Bash(python3 -c \"import json,sys; data=json.load\\(sys.stdin\\); rec=data[0]; print\\('=== RECORD 0 ==='\\); print\\(json.dumps\\(rec, indent=2\\)\\); print\\('=== RECORD 1 ==='\\); print\\(json.dumps\\(data[1], indent=2\\)\\); print\\('=== RECORD 2 \\(partial\\) ==='\\); print\\(json.dumps\\({k: data[2][k] for k in list\\(data[2].keys\\(\\)\\)[:20]}, indent=2\\)\\)\")",
+      "Bash(python3 *)",
+      "Bash(python *)",
+      "Bash(py -c \"import gspread; print\\('ok'\\)\")",
+      "Bash(/mnt/c/Python/speak/voice.exe)",
+      "Bash(pip list *)",
+      "Bash(pip3 list *)",
+      "Bash(sort -t'|' -k5 /mnt/c/Python/speak/reconstructor_data_AI.txt)",
+      "Bash(awk -F'|' '{print $5}')",
+      "Bash(awk *)",
+      "PowerShell(py -c \"import sys; print\\(sys.executable\\)\")",
+      "Bash(sleep 3; cat \"/c/Users/sintr/AppData/Local/Temp/claude/C--Python-SPeak/c86eba66-6965-4a69-bb70-2300e06e9460/tasks/bas8w3fdi.output\" 2>&1 | tail -10)",
+      "Bash(PYTHONIOENCODING=utf-8 /c/Windows/py \"C:/Python/SPeak/analisis_ep_umbral.py\")",
+      "Skill(update-config)",
+      "Skill(update-config:*)",
+      "Bash(cd \"C:/Users/sintr/Downloads\" && py -c \" *)"
+    ]
+  }
+}

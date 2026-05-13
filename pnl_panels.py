@@ -2746,19 +2746,25 @@ class HistoricoApuestasPanel(tk.Frame):
     def refrescar(self, decisiones, balance_inicial=0.0):
         self._cv.delete('row')
         rows = []
-        for d in reversed(decisiones):
+        for d in decisiones:
             if d.get('decision') != 'APOSTADA':
                 continue
             pnl = d.get('pnl')
             if pnl is None or float(pnl) == 0:
                 continue
             rows.append((d, float(pnl)))
-        saldo = balance_inicial
         n = len(rows)
+        saldos_acum = []
+        saldo = balance_inicial
+        for d, delta in rows:
+            saldo += delta
+            saldos_acum.append(saldo)
         total_h = self.HDR_H + n * self.ROW_H + 4
-        for row_idx, (d, delta) in enumerate(rows):
-            y = self.HDR_H + row_idx * self.ROW_H
-            bg = '#0A1628' if row_idx % 2 == 0 else '#07101E'
+        for display_idx, src_idx in enumerate(range(n - 1, -1, -1)):
+            d, delta = rows[src_idx]
+            saldo_row = saldos_acum[src_idx]
+            y = self.HDR_H + display_idx * self.ROW_H
+            bg = '#0A1628' if display_idx % 2 == 0 else '#07101E'
             self._cv.create_rectangle(0, y, self.TOTAL_W, y + self.ROW_H,
                                        fill=bg, outline='', tags='row')
             self._cv.create_line(0, y + self.ROW_H, self.TOTAL_W, y + self.ROW_H,
@@ -2772,14 +2778,13 @@ class HistoricoApuestasPanel(tk.Frame):
                 dot_clr = '#FF00FF' if acierto else '#FF44AA'
             else:
                 dot_clr = '#00FF88' if acierto else '#FF3366'
-            saldo += delta
             vals = {
                 '_dot':   '',
-                'idx':    str(n - row_idx),
+                'idx':    str(n - display_idx),
                 'issue':  d.get('issue', ''),
                 'filtro': d.get('filtro', ''),
                 'delta':  f"{delta:+.2f}",
-                'saldo':  f"{saldo:+.2f}",
+                'saldo':  f"{saldo_row:+.2f}",
             }
             x = 0
             for key, label, col_w, align in self._col_defs:
@@ -2793,12 +2798,12 @@ class HistoricoApuestasPanel(tk.Frame):
                     val = vals.get(key, '')
                     max_c = max(1, (col_w - 10) // 7)
                     if len(val) > max_c:
-                        val = val[:max_c - 1] + '…'
+                        val = val[:max_c - 1] + '\u2026'
                     tx = x + col_w // 2 if align == 'c' else x + 8
                     anc = 'center' if align == 'c' else 'w'
                     if key == 'saldo':
-                        fg = (C['accent2'] if saldo > 0
-                              else (C['accent3'] if saldo < 0 else C['muted']))
+                        fg = (C['accent2'] if saldo_row > 0
+                              else (C['accent3'] if saldo_row < 0 else C['muted']))
                         fnt = self.FONT_ROWB
                     elif key == 'delta':
                         fg = (C['accent2'] if delta > 0
